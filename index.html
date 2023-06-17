@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Power Automate replace() Generator</title>
+  <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+  <style>
+    table {
+        font-family: sans-serif;
+        width: 46em;
+        max-width: 46em;
+        font-size: 0.8em;
+        padding: 0.5em;
+        background: #eee;
+        box-shadow: 1px 1px 1px 0px #888;
+    }
+    
+    th, td {
+        padding: 0.25em;
+        text-align:left;
+        vertical-align: top;
+    }
+
+    th:first-of-type {
+        width: 50%;
+    }
+
+    input[type='text'] {
+        width: 80%;
+    }
+
+    tbody td:not(:last-of-type) {
+        width: 21em;
+    }
+
+    tbody td:last-of-type {
+        text-align: center;
+        width: 1em;
+    }
+
+    label.quotes {
+        font-weight: bold;
+        font-size: 1.25em;
+        font-family: serif;
+    }
+
+    #render {
+        font-size: 1.25em;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: monospace;
+        user-select: all;
+        max-width: 46em;
+    }
+
+    #render::before {
+        content: '📄 ';
+    }
+
+    summary:hover, label:hover {
+        color: #4CBB17;
+    }
+
+    summary:hover, button:hover, label:hover {
+        cursor:pointer;
+    }
+
+    input:hover {
+        border-color: #888;
+    }
+
+    input[type='text']:focus {
+        border-color: #111;
+        outline:none;
+    }
+
+    input[type='checkbox'] {
+        display:none;
+    }
+
+    input[type='checkbox']:checked + label {
+        color: #228B22;
+    }
+    details {
+        position: relative;
+        text-align: right;
+    }
+    details div{
+        text-align: right;
+        position: absolute;
+        top: 1.25em;
+        right: 0;
+        z-index: 2;
+        font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+    <table>
+        <thead>
+        <tr>
+            <th colspan="1">Power Automate replace() Generator</th>
+            <th colspan="2">
+                <details open>
+                    <summary>Options</summary>
+                    <div>
+                        <input type="checkbox" id="ignoreAtBrackets" v-model="ignoreAtBrackets" @change="updateRender" title="Ignores @{} on all input fields" /><label for="ignoreAtBrackets" title="Ignores @{} on all input fields">Ignore @{} on all input fields</label><br>
+                        <input type="checkbox" id="outsideExpression" v-model="outsideExpression" @change="updateRender" title="Adds @{} around the final result or not" /><label for="outsideExpression" title="Adds @{} around the final result or not">Add @{} to result</label>
+                    </div>
+                </details> 
+                </th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" v-model="source" placeholder="Source Content" id="sourceContent" @input="updateRender" title="This is the original string" /> <input type="checkbox" id="quotesSource" v-model="quotesSource" @change="updateRender" title="Add quotes to the source content" /><label for="quotesSource" class="quotes" title="Add quotes to the source content">❛❜</label></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr v-for="(input, index) of inputs" :key="index">
+            <td><input type="text" v-model="input.find" @input="updateRender" placeholder="Find" title="This is the text to find" /> <input type="checkbox" :id="`quotesFind${input.id}`" v-model="input.quotesFind" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesFind${input.id}`" class="quotes" title="Add quotes to the find field">❛❜</label></td>
+            <td><input type="text" v-model="input.replace" @input="updateRender" placeholder="Replace" title="Replace the text in the find field with this value" /> <input type="checkbox" :id="`quotesReplace${input.id}`" v-model="input.quotesReplace" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesReplace${input.id}`" class="quotes" title="Add quotes to the replace field">❛❜</label></td>
+            <td><button @click="removeInputs(input)" v-if="index !== inputs.length-1" title="Remove this find and replace pair">❌</button> <button @click="addInputs()" v-if="index === inputs.length-1" title="Add a new find and replace pair">➕</button></td>
+          </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" id="render">{{ render }}</td>
+            </tr>
+        </tfoot>
+      </table>
+</div>
+
+<script>
+const { createApp } = Vue
+
+let id = 0;
+
+createApp({
+    data() {
+        return {
+            source: '',
+            quotesSource: false,
+            outsideExpression: true,
+            ignoreAtBrackets: true,
+            inputs: [{ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: false }],
+            render: 'Add a source content value'
+        }
+    },
+    methods: {
+        addInputs() {
+            this.inputs.push({ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: false });
+        },
+        removeInputs(input) {
+            this.inputs = this.inputs.filter((i) => i !== input)
+            this.updateRender();
+        },
+        addQuotes(text, needsQuotes) {
+            if (needsQuotes) {
+                return "'" + this.ignoreInputAtBrackets(text) + "'";
+            }
+            return this.ignoreInputAtBrackets(text);
+        },
+        ignoreInputAtBrackets(text) {
+            if (this.ignoreAtBrackets) {
+                return text.replace(/^@{+/,'').replace(/}+$/,'');
+            }
+            return text;
+        },
+        updateRender() {
+            if (this.source === '') {
+                this.render = 'Add a source content value';
+            } else if (this.inputs[0].find === '' || this.inputs[0].replace === '') {
+                this.render = 'Add some find and replace values';
+            } else {
+                let render = '';
+                let source = '';
+                this.inputs.forEach((input, index) => {
+                    if (input.find === '') {
+                        return;
+                    }
+
+                    if (index === 0) {
+                        source = this.addQuotes(this.source, this.quotesSource); 
+                    } else {
+                        source = render;
+                    }
+
+                    find = this.addQuotes(input.find, input.quotesFind);
+                    replace = this.addQuotes(input.replace, input.quotesReplace);
+                    render = "replace(" + source + ", " + find + ", " + replace + ")";
+                });
+
+                if (this.outsideExpression) {
+                    this.render = '@{' + render + '}';
+                } else {
+                    this.render = render;
+                }
+            }
+        }
+    }
+}).mount('#app')
+</script>
+</body>
+</html>
