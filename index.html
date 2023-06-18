@@ -166,8 +166,9 @@ createApp({
             return this.ignoreInputAtBrackets(text);
         },
         ignoreInputAtBrackets(text) {
-            if (this.ignoreAtBrackets) {
-                return text.replace(/^@{+/,'').replace(/}+$/,'');
+            let openRegex = /^@{+/;
+            if (this.ignoreAtBrackets && text.match(openRegex)) {
+                return text.replace(openRegex,'').replace(/}+$/,'');
             }
             return text;
         },
