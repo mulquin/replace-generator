@@ -30,6 +30,16 @@
         width: 50%;
     }
 
+    th input[type='checkbox']:checked + label::before {
+        content: '✅ ';
+    }
+
+    td input[type='checkbox']:checked + label::after {
+        font-size:0.4em;
+        margin-left:-0.9em;
+        content: ' ✅';
+    }
+    
     input[type='text'] {
         width: 80%;
     }
