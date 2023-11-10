@@ -39,7 +39,7 @@
         margin-left:-0.9em;
         content: ' ✅';
     }
-    
+
     input[type='text'] {
         width: 80%;
     }
@@ -146,7 +146,7 @@
           <tr v-for="(input, index) of inputs" :key="index">
             <td><input type="text" v-model="input.find" @input="updateRender" placeholder="Find" title="This is the text to find" /> <input type="checkbox" :id="`quotesFind${input.id}`" v-model="input.quotesFind" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesFind${input.id}`" class="quotes" title="Add quotes to the find field">❛❜</label></td>
             <td><input type="text" v-model="input.replace" @input="updateRender" placeholder="Replace" title="Replace the text in the find field with this value" /> <input type="checkbox" :id="`quotesReplace${input.id}`" v-model="input.quotesReplace" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesReplace${input.id}`" class="quotes" title="Add quotes to the replace field">❛❜</label></td>
-            <td><button @click="removeInputs(input)" v-if="index !== inputs.length-1" title="Remove this find and replace pair">❌</button> <button @click="addInputs()" v-if="index === inputs.length-1" title="Add a new find and replace pair">➕</button></td>
+            <td><button @click="removeInputs(input)" v-if="index !== inputs.length-1" title="Remove this find and replace pair" tabindex="-1">❌</button> <button @click="addInputs()" v-if="index === inputs.length-1" title="Add a new find and replace pair" tabindex="-1">➕</button></td>
           </tr>
         </tbody>
         <tfoot>
