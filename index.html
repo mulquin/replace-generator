@@ -6,18 +6,24 @@
   <style>
     table {
         font-family: sans-serif;
-        width: 46em;
-        max-width: 46em;
         font-size: 0.8em;
         padding: 0.5em;
         background: #eee;
         box-shadow: 1px 1px 1px 0px #888;
+        border-collapse:collapse;
     }
-    
+    table * {
+        padding: 0.125em;
+    }
+
+    tr:hover {
+        background-color: #fefefe;
+    }
+
     th, td {
         padding: 0.25em;
         text-align:left;
-        vertical-align: top;
+        vertical-align: middle;
     }
 
     th:first-of-type {
@@ -26,10 +32,6 @@
 
     input[type='text'] {
         width: 80%;
-    }
-
-    tbody td:not(:last-of-type) {
-        width: 21em;
     }
 
     tbody td:last-of-type {
@@ -58,7 +60,6 @@
     #render:hover {
         overflow: visible;
         text-overflow: unset;
-        background-color: #eee;
     }
 
     #render::before {
@@ -89,6 +90,7 @@
     input[type='checkbox']:checked + label {
         color: #228B22;
     }
+
     details {
         position: relative;
         text-align: right;
@@ -96,14 +98,18 @@
     details div{
         text-align: right;
         position: absolute;
-        top: 1.25em;
+        top: 1.5em;
         right: 0;
         z-index: 2;
         font-weight: normal;
+        background-color: #ededed;
+        border-radius: 0.125em;
+        box-shadow: 1px 1px 1px 0px #888;
     }
   </style>
 </head>
 <body>
+
 
 <div id="app">
     <table>
@@ -111,7 +117,7 @@
         <tr>
             <th colspan="1">Power Automate replace() Generator</th>
             <th colspan="2">
-                <details open>
+                <details>
                     <summary>Options</summary>
                     <div>
                         <input type="checkbox" id="ignoreAtBrackets" v-model="ignoreAtBrackets" @change="updateRender" title="Ignores @{} on all input fields" /><label for="ignoreAtBrackets" title="Ignores @{} on all input fields">Ignore @{} on all input fields</label><br>
@@ -140,6 +146,7 @@
         </tfoot>
       </table>
 </div>
+
 
 <script>
 const { createApp } = Vue
@@ -212,5 +219,7 @@ createApp({
     }
 }).mount('#app')
 </script>
+
+
 </body>
 </html>
