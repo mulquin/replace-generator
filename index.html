@@ -55,25 +55,28 @@
         font-family: serif;
     }
 
-    #render {
+    tfoot td {
         font-size: 1.25em;
-        padding-top: 1em;
-        padding-bottom: 1em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         font-family: monospace;
         user-select: all;
-        max-width: 46em;
+        max-width: 45em;
+        padding: 1em 0 1em 0;
     }
 
-    #render:hover {
+    tfoot td:hover {
         overflow: visible;
         text-overflow: unset;
     }
 
     #render::before {
         content: '📄 ';
+    }
+
+    #preview::before {
+        content: '🖼️ ';
     }
 
     summary:hover, label:hover {
@@ -131,6 +134,7 @@
                 <details>
                     <summary>Options</summary>
                     <div>
+                        <input type="checkbox" id="showPreview" v-model="showPreview" @change="updateRender" title="Shows a preview underneath the result" /><label for="showPreview" title="Shows a preview underneath the result">Show Preview</label><br>
                         <input type="checkbox" id="reverseRows" @change="reverseRows" title="Reverses the nesting of the replace functions" /><label for="reverseRows" title="Reverses the nesting of the replace functions">Reverse rows</label><br>
                         <input type="checkbox" id="ignoreAtBrackets" v-model="ignoreAtBrackets" @change="updateRender" title="Ignores @{} on all input fields" /><label for="ignoreAtBrackets" title="Ignores @{} on all input fields">Ignore @{} on all input fields</label><br>
                         <input type="checkbox" id="outsideExpression" v-model="outsideExpression" @change="updateRender" title="Adds @{} around the final result or not" /><label for="outsideExpression" title="Adds @{} around the final result or not">Add @{} to result</label><br>
@@ -156,6 +160,9 @@
             <tr>
                 <td colspan="3" id="render">{{ render }}</td>
             </tr>
+            <tr v-if="showPreview === true && preview">
+                <td colspan="3" id="preview">{{ preview }}</td>
+            </tr>
         </tfoot>
       </table>
 </div>
@@ -174,8 +181,10 @@ createApp({
             outsideExpression: true,
             ignoreAtBrackets: true,
             defaultAddQuotes: false,
+            showPreview: false,
             inputs: [{ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: this.defaultAddQuotes }],
-            render: 'Add a source content value'
+            render: 'Add a source content value',
+            preview: ''
         }
     },
     methods: {
@@ -200,7 +209,6 @@ createApp({
             return text;
         },
         reverseRows() {
-            console.log('thingo');
             this.inputs.reverse();
             this.updateRender();
         },
@@ -212,6 +220,7 @@ createApp({
             } else {
                 let render = '';
                 let source = '';
+                let preview = '';
                 this.inputs.forEach((input, index) => {
                     if (input.find === '') {
                         return;
@@ -219,6 +228,7 @@ createApp({
 
                     if (index === 0) {
                         source = this.addQuotes(this.source, this.quotesSource); 
+                        preview = this.source;
                     } else {
                         source = render;
                     }
@@ -226,12 +236,19 @@ createApp({
                     find = this.addQuotes(input.find, input.quotesFind);
                     replace = this.addQuotes(input.replace, input.quotesReplace);
                     render = "replace(" + source + ", " + find + ", " + replace + ")";
+                    preview = preview.replaceAll(input.find, input.replace);
                 });
 
                 if (this.outsideExpression) {
                     this.render = '@{' + render + '}';
                 } else {
                     this.render = render;
+                }
+
+                if (this.showPreview) {
+                    this.preview = preview;
+                } else {
+                    this.preview = '';
                 }
             }
         }
