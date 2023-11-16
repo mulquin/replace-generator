@@ -130,6 +130,7 @@
                 <details>
                     <summary>Options</summary>
                     <div>
+                        <input type="checkbox" id="reverseRows" @change="reverseRows" title="Reverses the nesting of the replace functions" /><label for="reverseRows" title="Reverses the nesting of the replace functions">Reverse rows</label><br>
                         <input type="checkbox" id="ignoreAtBrackets" v-model="ignoreAtBrackets" @change="updateRender" title="Ignores @{} on all input fields" /><label for="ignoreAtBrackets" title="Ignores @{} on all input fields">Ignore @{} on all input fields</label><br>
                         <input type="checkbox" id="outsideExpression" v-model="outsideExpression" @change="updateRender" title="Adds @{} around the final result or not" /><label for="outsideExpression" title="Adds @{} around the final result or not">Add @{} to result</label>
                     </div>
@@ -194,6 +195,11 @@ createApp({
                 return text.replace(openRegex,'').replace(/}+$/,'');
             }
             return text;
+        },
+        reverseRows() {
+            console.log('thingo');
+            this.inputs.reverse();
+            this.updateRender();
         },
         updateRender() {
             if (this.source === '') {
