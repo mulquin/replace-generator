@@ -115,6 +115,7 @@
         background-color: #ededed;
         border-radius: 0.125em;
         box-shadow: 1px 1px 1px 0px #888;
+        padding: 0 0.25em 0 0.25em;
     }
   </style>
 </head>
@@ -132,7 +133,8 @@
                     <div>
                         <input type="checkbox" id="reverseRows" @change="reverseRows" title="Reverses the nesting of the replace functions" /><label for="reverseRows" title="Reverses the nesting of the replace functions">Reverse rows</label><br>
                         <input type="checkbox" id="ignoreAtBrackets" v-model="ignoreAtBrackets" @change="updateRender" title="Ignores @{} on all input fields" /><label for="ignoreAtBrackets" title="Ignores @{} on all input fields">Ignore @{} on all input fields</label><br>
-                        <input type="checkbox" id="outsideExpression" v-model="outsideExpression" @change="updateRender" title="Adds @{} around the final result or not" /><label for="outsideExpression" title="Adds @{} around the final result or not">Add @{} to result</label>
+                        <input type="checkbox" id="outsideExpression" v-model="outsideExpression" @change="updateRender" title="Adds @{} around the final result or not" /><label for="outsideExpression" title="Adds @{} around the final result or not">Add @{} to result</label><br>
+                        <input type="checkbox" id="defaultAddQuotes" v-model="defaultAddQuotes" @change="updateRender" title="Adds quotes to the replace field on newly created rows" /><label for="defaultAddQuotes" title="Adds quotes to the replace field on newly created rows">Add quotes to new replace fields</label>
                     </div>
                 </details> 
                 </th>
@@ -146,7 +148,7 @@
           </tr>
           <tr v-for="(input, index) of inputs" :key="index">
             <td><input type="text" v-model="input.find" @input="updateRender" placeholder="Find" title="This is the text to find" /> <input type="checkbox" :id="`quotesFind${input.id}`" v-model="input.quotesFind" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesFind${input.id}`" class="quotes" title="Add quotes to the find field">❛❜</label></td>
-            <td><input type="text" v-model="input.replace" @input="updateRender" placeholder="Replace" title="Replace the text in the find field with this value" /> <input type="checkbox" :id="`quotesReplace${input.id}`" v-model="input.quotesReplace" @change="updateRender" title="Add quotes to the replace field" /><label :for="`quotesReplace${input.id}`" class="quotes" title="Add quotes to the replace field">❛❜</label></td>
+            <td><input type="text" v-model="input.replace" @input="updateRender" placeholder="Replace" title="Replace the text in the find field with this value" /> <input type="checkbox" :id="`quotesReplace${input.id}`" v-model="input.quotesReplace" @change="updateRender" title="Toggle quotes on the replace field" /><label :for="`quotesReplace${input.id}`" class="quotes" title="Toggle quotes on the replace field">❛❜</label></td>
             <td><button @click="removeInputs(input)" v-if="index !== inputs.length-1" title="Remove this find and replace pair" tabindex="-1">❌</button> <button @click="addInputs()" v-if="index === inputs.length-1" title="Add a new find and replace pair" tabindex="-1">➕</button></td>
           </tr>
         </tbody>
@@ -171,13 +173,14 @@ createApp({
             quotesSource: false,
             outsideExpression: true,
             ignoreAtBrackets: true,
-            inputs: [{ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: false }],
+            defaultAddQuotes: false,
+            inputs: [{ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: this.defaultAddQuotes }],
             render: 'Add a source content value'
         }
     },
     methods: {
         addInputs() {
-            this.inputs.push({ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: false });
+            this.inputs.push({ id: id++, find: '', replace: '', quotesFind: true, quotesReplace: this.defaultAddQuotes });
         },
         removeInputs(input) {
             this.inputs = this.inputs.filter((i) => i !== input)
